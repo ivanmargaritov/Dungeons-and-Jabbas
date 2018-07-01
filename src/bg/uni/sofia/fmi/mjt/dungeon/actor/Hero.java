@@ -3,43 +3,20 @@ package bg.uni.sofia.fmi.mjt.dungeon.actor;
 import bg.uni.sofia.fmi.mjt.dungeon.treasure.Spell;
 import bg.uni.sofia.fmi.mjt.dungeon.treasure.Weapon;
 
-public class Hero implements Actor {
-	private String name;
-	private int health;
-	private int mana;
+public class Hero extends Character {
 	private Position position;
-	private Weapon weapon;
-	private Spell spell;
 	private int maxHealth;
-	private int minHealth;
 	private int maxMana;
 
 	public Hero(String name, int health, int mana, Position position) {
-		this.name = name;
-		this.health = health;
-		this.mana = mana;
-		this.position = position;
-		this.maxHealth = health;
-		this.minHealth = 0;
-		this.maxMana = mana;
-		this.weapon = null;
-		this.spell = null;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public int getHealth() {
-		return this.health;
+		super(name, health, mana);
+		this.position=position;
+		this.maxHealth=super.getHealth();
+		this.maxMana=super.getMana();
 	}
 
 	public int getMaxHealth() {
 		return this.maxHealth;
-	}
-
-	public int getMana() {
-		return this.mana;
 	}
 
 	public int getMaxMana() {
@@ -55,93 +32,42 @@ public class Hero implements Actor {
 		this.position.setY(y);
 	}
 
-	public boolean isAlive() {
-		return this.health > 0;
-	}
-
 	public void takeHealing(int healingPoints) {
-		if (this.isAlive()) {
-			if (this.health + healingPoints >= this.maxHealth) {
-				this.health = this.maxHealth;
+		if (isAlive()) {
+			if (this.getHealth() + healingPoints >= this.maxHealth) {
+				this.setHealth(this.maxHealth);
 			} else {
-				this.health += healingPoints;
+				this.setHealth(this.getHealth() + healingPoints);
 			}
-		}
-	}
-
-	public void takeDamage(int damagePoints) {
-		if (this.health - damagePoints >= this.minHealth) {
-			this.health -= damagePoints;
-		} else {
-			this.health = this.minHealth;
 		}
 	}
 
 	public void takeMana(int manaPoints) {
-		if (this.mana + manaPoints >= this.maxMana) {
-			this.mana = this.maxMana;
+		if (this.getMana() + manaPoints >= this.maxMana) {
+			this.setMana(this.maxMana);
 		} else {
-			this.mana += manaPoints;
+			this.setMana(this.getMana() + manaPoints);
 		}
 	}
 
 	public void equip(Weapon weapon) {
-		if (this.weapon == null) {
-			this.weapon = weapon;
+		if (this.getWeapon() == null) {
+			this.setWeapon(weapon);
 			return;
 		}
-		if (this.weapon.getDamage() < weapon.getDamage()) {
-			this.weapon = weapon;
+		if (this.getWeapon().getDamage() < weapon.getDamage()) {
+			this.setWeapon(weapon);
 		}
-	}
-
-	public Weapon getWeapon() {
-		return this.weapon;
 	}
 
 	public void learn(Spell spell) {
-		if (this.spell == null) {
-			this.spell = spell;
+		if (this.getSpell() == null) {
+			this.setSpell(spell);
 			return;
 		}
-		if (spell.getDamage() > this.spell.getDamage()) {
-			this.spell = spell;
+		if (spell.getDamage() > this.getSpell().getDamage()) {
+			this.setSpell(spell);
 		}
 	}
 
-	public Spell getSpell() {
-		return this.spell;
-	}
-
-	public int attack() {
-		if (this.weapon == null && this.spell == null) {
-			return 0;
-		} else if (this.weapon == null && this.spell != null) {
-			if (this.spell.getManaCost() <= this.mana) {
-				this.mana -= this.spell.getManaCost();
-				return this.spell.getDamage();
-			} else {
-				return 0;
-			}
-		}
-
-		else if (this.spell == null && this.weapon != null) {
-			return this.weapon.getDamage();
-		}
-
-		else if (this.weapon.getDamage() >= this.spell.getDamage()) {
-			return this.weapon.getDamage();
-		}
-
-		else if (this.weapon.getDamage() < this.spell.getDamage()) {
-			if (this.spell.getManaCost() <= this.mana) {
-				this.mana -= this.spell.getManaCost();
-				return this.spell.getDamage();
-			}
-			else {
-				return this.weapon.getDamage();
-			}
-		}
-		return 0;
-	}
 }

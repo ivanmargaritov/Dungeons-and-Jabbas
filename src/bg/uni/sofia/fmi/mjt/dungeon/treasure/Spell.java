@@ -2,23 +2,12 @@ package bg.uni.sofia.fmi.mjt.dungeon.treasure;
 
 import bg.uni.sofia.fmi.mjt.dungeon.actor.Hero;
 
-public class Spell implements Treasure {
-	private String name;
-	private int damage;
+public class Spell extends Attribute {
 	private int manaCost;
 
 	public Spell(String name, int damage, int manaCost) {
-		this.name = name;
-		this.damage = damage;
+		super(name, damage);
 		this.manaCost = manaCost;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public int getDamage() {
-		return this.damage;
 	}
 
 	public int getManaCost() {
@@ -29,10 +18,11 @@ public class Spell implements Treasure {
 		if (hero.getSpell() == null) {
 			hero.learn(this);
 		}
-		if (this.damage > hero.getSpell().damage) {
+		if (this.getDamage() > hero.getSpell().getDamage()) {
 			hero.learn(this);
 		}
 
-		return "Spell found! Damage points: " + hero.getSpell().damage + ", Mana cost: " + hero.getSpell().manaCost;
+		return "Spell found! Damage points: " + hero.getSpell().getDamage() + ", Mana cost: "
+				+ hero.getSpell().manaCost;
 	}
 }
