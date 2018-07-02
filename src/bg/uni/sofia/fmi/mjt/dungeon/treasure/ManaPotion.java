@@ -8,12 +8,14 @@ public class ManaPotion extends Potion {
 		super(manaPoints);
 	}
 
-	public int heal() {
+	public int getManaPoints() {
 		return super.getPotionPoints();
 	}
 
 	public String collect(Hero hero) {
-
+		if (hero == null) {
+			throw new IllegalArgumentException();
+		}
 		if (this.getPotionPoints() + hero.getMana() <= hero.getMaxMana()) {
 			hero.takeMana(this.getPotionPoints());
 			return "Mana potion found! " + this.getPotionPoints() + " mana points added to your hero!";

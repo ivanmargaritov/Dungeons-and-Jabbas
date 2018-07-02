@@ -1,3 +1,8 @@
+/*
+import java.util.ArrayList;
+import java.util.List;
+
+import bg.uni.sofia.fmi.mjt.dungeon.Direction;
 import bg.uni.sofia.fmi.mjt.dungeon.GameEngine;
 import bg.uni.sofia.fmi.mjt.dungeon.actor.Enemy;
 import bg.uni.sofia.fmi.mjt.dungeon.actor.Hero;
@@ -19,7 +24,7 @@ public class Main {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		Hero hanzo = new Hero("Hanzo", 400, 700, new Position(0, 0));
 		System.out.println(hanzo.getName());
 		System.out.println(hanzo.getHealth());
@@ -35,12 +40,12 @@ public class Main {
 		System.out.println(hanzo.getMana());
 
 		Weapon dagger = new Weapon("Dagger", 70);
-		hanzo.equip(dagger);
+		hanzo.equipWeapon(dagger);
 
 		System.out.println(hanzo.getWeapon().getName());
 
 		Spell rage = new Spell("Rage", 90, 40);
-		hanzo.learn(rage);
+		hanzo.learnSpell(rage);
 
 		System.out.println(hanzo.getSpell().getName());
 		System.out.println(hanzo.attack());
@@ -79,7 +84,7 @@ public class Main {
 		Enemy knight = new Enemy("Knight", 70, 55, sword, speed);
 
 		HealthPotion heal = new HealthPotion(40);
-		System.out.println(heal.heal());
+		System.out.println(heal.getHealingPoints());
 		System.out.println(heal.collect(hanzo));
 		System.out.println(hanzo.getHealth());
 		System.out.println(heal.collect(hanzo));
@@ -92,7 +97,7 @@ public class Main {
 		System.out.println(hanzo.getHealth());
 
 		ManaPotion mana = new ManaPotion(30);
-		System.out.println("mana potion" + "\n" + mana.heal());
+		System.out.println("mana potion" + "\n" + mana.getManaPoints());
 		System.out.println(hanzo.getMana());
 		System.out.println(mana.collect(hanzo));
 		System.out.println(hanzo.getMana());
@@ -111,91 +116,97 @@ public class Main {
 
 		print(map);
 
-		Enemy[] enemies = { dart, vader, knight };
-		Treasure[] treasures = { heal, mana, heal1 };
+		List<Enemy> enemies = new ArrayList<>();
+		enemies.add(dart);
+		enemies.add(vader);
+		enemies.add(knight);
+		List<Treasure> treasures = new ArrayList<>();
+		treasures.add(heal);
+		treasures.add(mana);
+		treasures.add(heal1);
 
 		GameEngine game = new GameEngine(map, hanzo, enemies, treasures);
-		System.out.println(game.makeMove(2));
+		System.out.println(game.makeMove(Direction.RIGHT));
 		System.out.println();
 
-		System.out.println(game.makeMove(3));
+		System.out.println(game.makeMove(Direction.DOWN));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(3));
+		System.out.println(game.makeMove(Direction.DOWN));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(3));
+		System.out.println(game.makeMove(Direction.DOWN));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(2));
+		System.out.println(game.makeMove(Direction.RIGHT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(2));
+		System.out.println(game.makeMove(Direction.RIGHT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(2));
+		System.out.println(game.makeMove(Direction.RIGHT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(2));
+		System.out.println(game.makeMove(Direction.RIGHT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(0));
+		System.out.println(game.makeMove(Direction.LEFT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(0));
+		System.out.println(game.makeMove(Direction.LEFT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(3));
+		System.out.println(game.makeMove(Direction.DOWN));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(1));
+		System.out.println(game.makeMove(Direction.UP));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(2));
+		System.out.println(game.makeMove(Direction.RIGHT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(2));
+		System.out.println(game.makeMove(Direction.RIGHT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(1));
+		System.out.println(game.makeMove(Direction.UP));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(1));
+		System.out.println(game.makeMove(Direction.UP));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(0));
+		System.out.println(game.makeMove(Direction.LEFT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(1));
+		System.out.println(game.makeMove(Direction.UP));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(2));
+		System.out.println(game.makeMove(Direction.RIGHT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(2));
+		System.out.println(game.makeMove(Direction.RIGHT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(2));
+		System.out.println(game.makeMove(Direction.RIGHT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(2));
+		System.out.println(game.makeMove(Direction.RIGHT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(2));
+		System.out.println(game.makeMove(Direction.RIGHT));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(3));
+		System.out.println(game.makeMove(Direction.DOWN));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(3));
+		System.out.println(game.makeMove(Direction.DOWN));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(3));
+		System.out.println(game.makeMove(Direction.DOWN));
 		print(game.getMap());
 		System.out.println();
-		System.out.println(game.makeMove(3));
+		System.out.println(game.makeMove(Direction.DOWN));
 		print(game.getMap());
 		System.out.println();
-
 	}
 }
+*/

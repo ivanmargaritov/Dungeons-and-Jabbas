@@ -3,21 +3,21 @@ package bg.uni.sofia.fmi.mjt.dungeon.actor;
 import bg.uni.sofia.fmi.mjt.dungeon.treasure.Spell;
 import bg.uni.sofia.fmi.mjt.dungeon.treasure.Weapon;
 
-abstract class Character implements Actor{
+abstract class Character implements Actor {
 	private String name;
 	private int health;
 	private int mana;
 	private Weapon weapon;
 	private Spell spell;
 	private int minHealth;
-	
+
 	public Character(String name, int health, int mana) {
-		this.name=name;
+		this.name = name;
 		this.setHealth(health);
 		this.setMana(mana);
-		this.minHealth=0;
+		this.minHealth = 0;
 	}
-	
+
 	public String getName() {
 		return this.name;
 	}
@@ -25,7 +25,7 @@ abstract class Character implements Actor{
 	public int getHealth() {
 		return this.health;
 	}
-	
+
 	public int getMana() {
 		return this.mana;
 	}
@@ -33,36 +33,34 @@ abstract class Character implements Actor{
 	public boolean isAlive() {
 		return this.getHealth() > 0;
 	}
-	
+
 	public Weapon getWeapon() {
 		return this.weapon;
 	}
-	
+
 	public Spell getSpell() {
 		return this.spell;
 	}
-	
+
 	public void takeDamage(int damagePoints) {
-		if (this.getHealth() - damagePoints >= this.minHealth) {
-			this.setHealth(this.getHealth() - damagePoints);
-		} else {
-			this.setHealth(this.minHealth);
+		if (damagePoints < 0) {
+			throw new IllegalArgumentException();
+		}
+		if (isAlive()) {
+			if (this.getHealth() - damagePoints >= this.minHealth) {
+				this.setHealth(this.getHealth() - damagePoints);
+			} else {
+				this.setHealth(this.minHealth);
+			}
 		}
 	}
-	
+
 	public int attack() {
 		if (this.getWeapon() == null && this.getSpell() == null) {
 			return 0;
 		} else if (this.getWeapon() == null && this.getSpell() != null) {
-			if (this.getSpell().getManaCost() <= this.getMana()) {
-				this.setMana(this.getMana() - this.getSpell().getManaCost());
-				return this.getSpell().getDamage();
-			} else {
-				return 0;
-			}
-		}
-
-		else if (this.getSpell() == null && this.getWeapon() != null) {
+			return attackWithSpell();
+		} else if (this.getSpell() == null && this.getWeapon() != null) {
 			return this.getWeapon().getDamage();
 		}
 
@@ -70,16 +68,27 @@ abstract class Character implements Actor{
 			return this.getWeapon().getDamage();
 		}
 
-		else if (this.getWeapon().getDamage() < this.getSpell().getDamage()) {
-			if (this.getSpell().getManaCost() <= this.getMana()) {
-				this.setMana(this.getMana() - this.getSpell().getManaCost());
-				return this.getSpell().getDamage();
-			}
-			else {
-				return this.getWeapon().getDamage();
-			}
+		else {
+			return attackWithSpellOverWeapon();
 		}
-		return 0;
+	}
+
+	private int attackWithSpell() {
+		if (this.getSpell().getManaCost() <= this.getMana()) {
+			this.setMana(this.getMana() - this.getSpell().getManaCost());
+			return this.getSpell().getDamage();
+		} else {
+			return 0;
+		}
+	}
+
+	private int attackWithSpellOverWeapon() {
+		if (this.getSpell().getManaCost() <= this.getMana()) {
+			this.setMana(this.getMana() - this.getSpell().getManaCost());
+			return this.getSpell().getDamage();
+		} else {
+			return this.getWeapon().getDamage();
+		}
 	}
 
 	public void setHealth(int health) {

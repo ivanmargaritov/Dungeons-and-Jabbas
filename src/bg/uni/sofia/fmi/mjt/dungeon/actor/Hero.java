@@ -10,9 +10,9 @@ public class Hero extends Character {
 
 	public Hero(String name, int health, int mana, Position position) {
 		super(name, health, mana);
-		this.position=position;
-		this.maxHealth=super.getHealth();
-		this.maxMana=super.getMana();
+		this.position = position;
+		this.maxHealth = super.getHealth();
+		this.maxMana = super.getMana();
 	}
 
 	public int getMaxHealth() {
@@ -33,6 +33,10 @@ public class Hero extends Character {
 	}
 
 	public void takeHealing(int healingPoints) {
+		if (healingPoints < 0) {
+			throw new IllegalArgumentException();
+		}
+
 		if (isAlive()) {
 			if (this.getHealth() + healingPoints >= this.maxHealth) {
 				this.setHealth(this.maxHealth);
@@ -43,6 +47,9 @@ public class Hero extends Character {
 	}
 
 	public void takeMana(int manaPoints) {
+		if (manaPoints < 0) {
+			throw new IllegalArgumentException();
+		}
 		if (this.getMana() + manaPoints >= this.maxMana) {
 			this.setMana(this.maxMana);
 		} else {
@@ -50,7 +57,10 @@ public class Hero extends Character {
 		}
 	}
 
-	public void equip(Weapon weapon) {
+	public void equipWeapon(Weapon weapon) {
+		if (weapon == null) {
+			throw new IllegalArgumentException();
+		}
 		if (this.getWeapon() == null) {
 			this.setWeapon(weapon);
 			return;
@@ -60,7 +70,10 @@ public class Hero extends Character {
 		}
 	}
 
-	public void learn(Spell spell) {
+	public void learnSpell(Spell spell) {
+		if (spell == null) {
+			throw new IllegalArgumentException();
+		}
 		if (this.getSpell() == null) {
 			this.setSpell(spell);
 			return;

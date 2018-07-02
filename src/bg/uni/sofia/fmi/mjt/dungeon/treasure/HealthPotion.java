@@ -8,13 +8,15 @@ public class HealthPotion extends Potion {
 		super(healingPoints);
 	}
 
-	public int heal() {
+	public int getHealingPoints() {
 		return super.getPotionPoints();
 	}
 
 	public String collect(Hero hero) {
-
-		if (hero.getHealth() == 0) {
+		if (hero == null) {
+			throw new IllegalArgumentException();
+		}
+		if (!hero.isAlive()) {
 			this.setPotionPoints(0);
 			return "Health potion found! " + this.getPotionPoints() + " health points added to your hero!";
 		} else if (this.getPotionPoints() + hero.getHealth() <= hero.getMaxHealth()) {

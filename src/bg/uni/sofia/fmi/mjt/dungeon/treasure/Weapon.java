@@ -9,15 +9,17 @@ public class Weapon extends Attribute {
 	}
 
 	public String collect(Hero hero) {
-
+		if (hero == null) {
+			throw new IllegalArgumentException();
+		}
 		if (hero.getWeapon() == null) {
-			hero.equip(this);
+			hero.equipWeapon(this);
 		}
 
 		if (this.getDamage() > hero.getWeapon().getDamage()) {
-			hero.equip(this);
+			hero.equipWeapon(this);
 		}
 
-		return "Weapon found! Damage points: " + hero.getWeapon().getDamage();
+		return "Weapon found! Damage points: " + this.getDamage();
 	}
 }

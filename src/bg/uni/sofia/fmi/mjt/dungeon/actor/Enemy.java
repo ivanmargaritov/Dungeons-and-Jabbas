@@ -7,6 +7,9 @@ public class Enemy extends Character {
 
 	public Enemy(String name, int health, int mana, Weapon weapon, Spell spell) {
 		super(name, health, mana);
+		if (weapon == null || spell == null) {
+			throw new IllegalArgumentException();
+		}
 		super.setWeapon(weapon);
 		super.setSpell(spell);
 	}
