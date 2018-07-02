@@ -1,5 +1,7 @@
 package bg.uni.sofia.fmi.mjt.dungeon;
 
+import java.util.List;
+
 import bg.uni.sofia.fmi.mjt.dungeon.actor.Enemy;
 import bg.uni.sofia.fmi.mjt.dungeon.actor.Hero;
 import bg.uni.sofia.fmi.mjt.dungeon.treasure.Treasure;
@@ -7,12 +9,15 @@ import bg.uni.sofia.fmi.mjt.dungeon.treasure.Treasure;
 public class GameEngine {
 	private char[][] map;
 	private Hero hero;
-	private Enemy[] enemies;
+	private List<Enemy> enemies;
 	private int enemyToFight;
-	private Treasure[] treasures;
+	private List<Treasure> treasures;
 	private int treasuresTaken;
 
-	public GameEngine(char[][] map, Hero hero, Enemy[] enemies, Treasure[] treasures) {
+	public GameEngine(char[][] map, Hero hero, List<Enemy> enemies, List<Treasure> treasures) {
+		if (map == null || hero == null || enemies == null || treasures == null) {
+			throw new IllegalArgumentException();
+		}
 		this.map = map;
 		this.hero = hero;
 		this.enemies = enemies;
@@ -25,74 +30,97 @@ public class GameEngine {
 		return map;
 	}
 
-	public String makeMove(int command) {
-		if (command == 0 || command == 1 || command == 2 || command == 3) {
-			int futurePositionX = hero.getPosition().getX();
-			int futurePositionY = hero.getPosition().getY();
-
-			switch (command) {
-			case 0:
-				futurePositionY -= 1;
-				break;
-			case 1:
-				futurePositionX -= 1;
-				break;
-			case 2:
-				futurePositionY += 1;
-				break;
-			case 3:
-				futurePositionX += 1;
-				break;
-			}
-
-			if (this.map[futurePositionX][futurePositionY] == '.') {
-
-				map[hero.getPosition().getX()][hero.getPosition().getY()] = '.';
-				hero.setPosition(futurePositionX, futurePositionY);
-				map[futurePositionX][futurePositionY] = 'H';
-
-				return "You moved successfully to the next position.";
-			}
-
-			else if (this.map[futurePositionX][futurePositionY] == '#') {
-				return "Wrong move. There is an obstacle and you cannot bypass it.";
-			}
-
-			else if (this.map[futurePositionX][futurePositionY] == 'T') {
-				map[hero.getPosition().getX()][hero.getPosition().getY()] = '.';
-				hero.setPosition(futurePositionX, futurePositionY);
-				map[futurePositionX][futurePositionY] = 'H';
-				treasuresTaken++;
-				return this.treasures[treasuresTaken - 1].collect(hero);
-			}
-
-			else if (this.map[futurePositionX][futurePositionY] == 'E') {
-
-				while (enemies[enemyToFight].isAlive() && hero.isAlive()) {
-					enemies[enemyToFight].takeDamage(hero.attack());
-					hero.takeDamage(enemies[enemyToFight].attack());
-				}
-				if (!enemies[enemyToFight].isAlive()) {
-					map[hero.getPosition().getX()][hero.getPosition().getY()] = '.';
-					hero.setPosition(futurePositionX, futurePositionY);
-					map[futurePositionX][futurePositionY] = 'H';
-					enemyToFight++;
-					return "Enemy died.";
-				} else {
-					enemyToFight++;
-					return "Hero is dead! Game over!";
-				}
-			}
-
-			else if (this.map[futurePositionX][futurePositionY] == 'G') {
-				return "You have successfully passed through the dungeon. Congrats!";
-			} else {
-				return "";
-			}
+	public String makeMove(Direction command) {
+		if (command == null) {
+			throw new IllegalArgumentException();
 		}
+		if (command.equals(Direction.UP) || command.equals(Direction.DOWN) || command.equals(Direction.LEFT)
+				|| command.equals(Direction.RIGHT)) {
+			int futurePositionX = findPositionX(command);
+			int futurePositionY = findPositionY(command);
 
-		else {
-			return "Unknown command entered.";
+			return moveThroughMap(futurePositionX, futurePositionY);
+		} else {
+			return "Unknown command!";
 		}
+	}
+
+	private int findPositionX(Direction command) {
+		int futurePositionX = hero.getPosition().getX();
+		if (command.equals(Direction.UP)) {
+			futurePositionX -= 1;
+		}
+		if (command.equals(Direction.DOWN)) {
+			futurePositionX += 1;
+		}
+		return futurePositionX;
+	}
+
+	private int findPositionY(Direction command) {
+		int futurePositionY = hero.getPosition().getY();
+		if (command.equals(Direction.LEFT)) {
+			futurePositionY -= 1;
+		}
+		if (command.equals(Direction.RIGHT)) {
+			futurePositionY += 1;
+		}
+		return futurePositionY;
+	}
+
+	private String moveThroughMap(int futurePositionX, int futurePositionY) {
+		switch (this.map[futurePositionX][futurePositionY]) {
+		case '.':
+			return passThroughEmptySpot(futurePositionX, futurePositionY);
+		case '#':
+			return passThroughObstacle();
+		case 'T':
+			return findTreasure(futurePositionX, futurePositionY);
+		case 'E':
+			return fightEnemy(futurePositionX, futurePositionY);
+		case 'G':
+			return finishSuccessfully();
+		default:
+			return "Unknown symbol on map!";
+		}
+	}
+
+	private String passThroughEmptySpot(int futurePositionX, int futurePositionY) {
+		map[hero.getPosition().getX()][hero.getPosition().getY()] = '.';
+		hero.setPosition(futurePositionX, futurePositionY);
+		map[futurePositionX][futurePositionY] = 'H';
+		return "You moved successfully to the next position.";
+	}
+
+	private String passThroughObstacle() {
+		return "Wrong move. There is an obstacle and you cannot bypass it.";
+	}
+
+	private String findTreasure(int futurePositionX, int futurePositionY) {
+		map[hero.getPosition().getX()][hero.getPosition().getY()] = '.';
+		hero.setPosition(futurePositionX, futurePositionY);
+		map[futurePositionX][futurePositionY] = 'H';
+		treasuresTaken++;
+		return this.treasures.get(treasuresTaken - 1).collect(hero);
+	}
+
+	private String fightEnemy(int futurePositionX, int futurePositionY) {
+		while (enemies.get(enemyToFight).isAlive() && hero.isAlive()) {
+			enemies.get(enemyToFight).takeDamage(hero.attack());
+			hero.takeDamage(enemies.get(enemyToFight).attack());
+		}
+		if (!enemies.get(enemyToFight).isAlive()) {
+			map[hero.getPosition().getX()][hero.getPosition().getY()] = '.';
+			hero.setPosition(futurePositionX, futurePositionY);
+			map[futurePositionX][futurePositionY] = 'H';
+			enemyToFight++;
+			return "Enemy died.";
+		} else {
+			enemyToFight++;
+			return "Hero is dead! Game over!";
+		}
+	}
+
+	private String finishSuccessfully() {
+		return "You have successfully passed through the dungeon. Congrats!";
 	}
 }
